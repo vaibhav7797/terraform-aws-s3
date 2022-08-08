@@ -84,6 +84,29 @@ resource "aws_s3_bucket_logging" "example" {
   target_prefix = var.target_prefix
 }
 
+    resource "aws_s3_bucket_request_payment_configuration" "example" {
+  count = var.create_bucket && var.request_payer == true ? 1 : 0
+
+  bucket = join("", aws_s3_bucket.s3_default.*.id)
+  payer  = "Requester"
+}
+
+resource "aws_s3_bucket_versioning" "example" {
+  count = var.create_bucket && var.versioning == true ? 1 : 0
+
+  bucket = join("", aws_s3_bucket.s3_default.*.id)
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_logging" "example" {
+  count  = var.create_bucket && var.logging == true ? 1 : 0
+  bucket = join("", aws_s3_bucket.s3_default.*.id)
+
+  target_bucket = var.target_bucket
+  target_prefix = var.target_prefix
+}
 resource "aws_s3_bucket_server_side_encryption_configuration" "example" {
   count  = var.create_bucket && var.enable_server_side_encryption == true ? 1 : 0
   bucket = join("", aws_s3_bucket.s3_default.*.id)
